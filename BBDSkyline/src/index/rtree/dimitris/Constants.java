@@ -68,7 +68,7 @@ class Constants
     public static void error (String msg, boolean fatal)
     {
         System.out.println(msg);
-        if (fatal) System.exit(1);
+        //if (fatal) System.exit(1);
     }
 
     // returns the d-dimension area of the mbr

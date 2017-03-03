@@ -110,7 +110,7 @@ public final class RTree
     /**
     * Construct(read) an R*-tree from disk
     */
-    RTree(String fname, int cache_size)
+    public RTree(String fname, int cache_size)
     // bereits vorhandenen R-Baum laden
     {
         node_weight = new float[20];
@@ -122,7 +122,7 @@ public final class RTree
         }
         catch (IOException e)
         {
-            Constants.error("RTree reading: error in block file initialization", true);
+//            Constants.error("RTree reading: error in block file initialization", true);
         }
 
         // header allokieren und lesen
@@ -133,7 +133,7 @@ public final class RTree
         }
         catch (IOException e)
         {
-            Constants.error("RTree header reading: error in block file initialization", true);
+//            Constants.error("RTree header reading: error in block file initialization", true);
         }
 
         try

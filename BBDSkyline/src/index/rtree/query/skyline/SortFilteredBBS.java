@@ -1,18 +1,18 @@
 package index.rtree.query.skyline;
 
 
-import index.rtree.query.Query;
-import index.rtree.query.QueryResult;
-import experiment.skyline.ExpConfig;
 import index.basic_ds.SortedLinList;
 import index.rtree.dimitris.*;
+import index.rtree.query.Query;
+import index.rtree.query.QueryResult;
 import skyline.hotel.global.SKY_Constants;
 
-public class BBSkyline extends Query{
+public class SortFilteredBBS extends Query{
 
     HeapEntry he; Dir_Entry de; Data_Entry de2;
+    private float[] weight;
 
-    public BBSkyline(RTree tree) {
+    public SortFilteredBBS(RTree tree) {
         super(tree);
     }
 
@@ -33,11 +33,17 @@ public class BBSkyline extends Query{
 
             RTDirNode node = (RTDirNode) root_ptr;
 
+            float[] mbr = node.get_mbr();
+
+            weight = new float[node.get_dim()];
+            for (int i = 0; i < node.get_dim() ; i++)
+                weight[i] = (mbr[2*i+1] - mbr[2*i]);
+
             DirEntry[] entries = node.entries;
 
             for (int i = 0; i < node.get_num(); i++) {
                 DirEntry entry = entries[i];
-                heap.insert(new Dir_Entry(entry.get_son()));
+                heap.insert(new Dir_Entry(entry.get_son(), weight));
             }
         }
 
@@ -55,8 +61,7 @@ public class BBSkyline extends Query{
                     Data_Entry data_entry = (Data_Entry) obj;
                     data_entry.data.distanz = data_entry.dist;
                     Result_Set.insert(obj);
-                    System.out.println("BBS, " + ((Data_Entry) obj).data);
-                    Data data = (data_entry.data);
+                    System.out.println("SFBBS, " + ((Data_Entry) obj).data);
                 }
 
                 else{
@@ -73,7 +78,7 @@ public class BBSkyline extends Query{
 
                             if(SKY_Constants.isDominated(child.data, Result_Set) ) continue;
 
-                            else heap.insert(new Data_Entry(child));
+                            else heap.insert(new Data_Entry(child, weight));
                         }
 
                     }
@@ -94,7 +99,7 @@ public class BBSkyline extends Query{
                                 if( SKY_Constants.isDominated(child_ptr.get_mbr(), Result_Set) ) continue;
 
                                 else
-                                    heap.insert(new Dir_Entry(child_ptr));
+                                    heap.insert(new Dir_Entry(child_ptr, weight));
                             }
 
                             else{
@@ -104,7 +109,7 @@ public class BBSkyline extends Query{
                                 if( SKY_Constants.isDominated(child_ptr.get_mbr(), Result_Set) ) continue;
 
                                 else
-                                    heap.insert(new Dir_Entry(child_ptr));
+                                    heap.insert(new Dir_Entry(child_ptr, weight));
 
                             }
                         }

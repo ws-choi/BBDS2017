@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class ExpConfig {
 
+
     static Map<Integer, float[]> startPointMap = new HashMap<>();
     static Map<Integer, float[]> weightMap = new HashMap<>();;
 
@@ -22,12 +23,17 @@ public class ExpConfig {
     public int cardinality;
     public String distribution;
     public String fileName;
-    public QueryResult result;
+    public final String outputPrefix;
+
+
+    public Map<String, QueryResult> resultMap;
 
     public ExpConfig(int dim, int cardinality, String distribution) {
         this.dim = dim;
         this.cardinality = cardinality;
         this.distribution = distribution;
+        outputPrefix  = dim+   ", " + cardinality + ", " + distribution + ", ";
+        resultMap = new HashMap<>();
     }
 
     public void makeFile(String DirName) {
@@ -42,7 +48,7 @@ public class ExpConfig {
 
                 case Anti_RandomStretched_1:
                     AntiCorrGenWithC innerGenerator = new AntiCorrGenWithC(dim, 1);
-                    generator = new StretchedGen(innerGenerator, dim, getStartPointOrRandomPoint(dim), getWeightorRandomWeight(dim));
+                    generator = new StretchedGen(innerGenerator, dim, getStartPointOrRandomPoint(dim), getWeightOrRandomWeight(dim));
                     break;
 
             }
@@ -58,7 +64,7 @@ public class ExpConfig {
 
     }
 
-    private float[] getWeightorRandomWeight(int dim) {
+    private float[] getWeightOrRandomWeight(int dim) {
 
         if(!weightMap.containsKey(dim))
             weightMap.put(dim, getRandomVector(dim));
@@ -88,15 +94,8 @@ public class ExpConfig {
     public String toString() {
 
         StringBuffer res = new StringBuffer();
-        res.append(dim);
-        res.append(", ");
-        res.append(cardinality);
-        res.append(", ");
-        res.append(distribution);
-        res.append(", ");
-        res.append(result.toString());
-        res.append(", ");
-        res.append( ((SortedLinList)result.result).get_num());
+
+        resultMap.forEach((algorithm, queryResult) -> res.append(algorithm + ", " + outputPrefix + queryResult + ", " + ((SortedLinList)queryResult.result).get_num() + "\n"));
 
         return res.toString();
 
